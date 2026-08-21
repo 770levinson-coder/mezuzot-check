@@ -1,103 +1,150 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ניהול — בדיקת מזוזות</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: "Segoe UI", Arial, sans-serif; direction: rtl; background: #f5f0e8; }
-    header { background: #1a3a2a; color: #fff; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; }
-    header h1 { font-size: 1.3rem; }
-    .btn { padding: 8px 18px; border-radius: 8px; border: none; cursor: pointer; font-size: .9rem; font-weight: 600; }
-    .btn-green { background: #2e6644; color: #fff; }
-    .btn-red   { background: #c0392b; color: #fff; }
-    .btn-grey  { background: #aaa; color: #fff; }
-    .content { padding: 20px; max-width: 900px; margin: 0 auto; }
-    .stats { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
-    .stat-card { background: #fff; border-radius: 10px; padding: 16px 24px; box-shadow: 0 1px 6px rgba(0,0,0,.1); text-align: center; }
-    .stat-card .num { font-size: 2rem; font-weight: bold; color: #1a3a2a; }
-    .stat-card .lbl { font-size: .85rem; color: #666; }
-    table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,.1); }
-    th { background: #2e6644; color: #fff; padding: 10px 12px; font-size: .9rem; }
-    td { padding: 10px 12px; border-bottom: 1px solid #eee; font-size: .9rem; vertical-align: middle; }
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background: #f9f9f9; }
-    .empty { text-align: center; padding: 40px; color: #888; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ניהול — בדיקת מזוזות</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "Segoe UI", Arial, sans-serif; direction: rtl; background: #f5f0e8; }
+header { background: #2e5090; color: #fff; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; }
+header h1 { font-size: 1.3rem; }
+.btn { padding: 8px 18px; border-radius: 8px; border: none; cursor: pointer; font-size: .9rem; font-weight: 600; }
+.btn-green { background: #2e6644; color: #fff; }
+.btn-red { background: #c0392b; color: #fff; }
+.btn-blue { background: #2e5090; color: #fff; }
+.btn-grey { background: #aaa; color: #fff; }
+.content { padding: 20px; max-width: 960px; margin: 0 auto; }
+.stats { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+.stat-card { background: #fff; border-radius: 10px; padding: 16px 24px; box-shadow: 0 1px 6px rgba(0,0,0,.1); text-align: center; }
+.stat-card .num { font-size: 2rem; font-weight: bold; color: #1a3a2a; }
+.stat-card .lbl { font-size: .85rem; color: #666; }
+table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,.1); }
+th { background: #2e6644; color: #fff; padding: 10px 12px; font-size: .9rem; }
+td { padding: 10px 12px; border-bottom: 1px solid #eee; font-size: .9rem; vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #f9f9f9; }
+.empty { text-align: center; padding: 40px; color: #888; }
+/* modal */
+.modal-backdrop { display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:100; align-items:center; justify-content:center; }
+.modal-backdrop.open { display:flex; }
+.modal { background:#fff; border-radius:14px; padding:28px 24px; width:360px; max-width:95vw; }
+.modal h2 { margin-bottom:18px; font-size:1.1rem; color:#1a3a2a; }
+.modal label { display:block; font-weight:600; font-size:.9rem; margin-bottom:4px; margin-top:12px; }
+.modal input { width:100%; padding:9px 12px; border:1.5px solid #ccc; border-radius:8px; font-size:1rem; direction:rtl; }
+.modal input:focus { outline:none; border-color:#2e6644; }
+.modal-btns { display:flex; gap:10px; margin-top:20px; justify-content:flex-end; }
+</style>
 </head>
 <body>
 <header>
-  <h1>📜 ניהול — בדיקת מזוזות</h1>
-  <div style="display:flex;gap:10px">
-    <button class="btn btn-green" onclick="exportCsv()">ייצוא CSV</button>
-    <button class="btn btn-grey"  onclick="location.href='/'">לאתר</button>
-  </div>
+<h1>📜 ניהול — בדיקת מזוזות</h1>
+<div style="display:flex;gap:10px">
+<button class="btn btn-green" onclick="exportCsv()">ייצוא CSV</button>
+<button class="btn btn-grey" onclick="location.href='/'">לאתר</button>
+</div>
 </header>
 
 <div class="content">
-  <div class="stats">
-    <div class="stat-card"><div class="num" id="stat-people">—</div><div class="lbl">נרשמים</div></div>
-    <div class="stat-card"><div class="num" id="stat-mezuzot">—</div><div class="lbl">מזוזות</div></div>
-    <div class="stat-card"><div class="num" id="stat-income">—</div><div class="lbl">הכנסה מץויה (₪)</div></div>
-  </div>
+<div class="stats">
+<div class="stat-card"><div class="num" id="stat-people">—</div><div class="lbl">נרשמים</div></div>
+<div class="stat-card"><div class="num" id="stat-mezuzot">—</div><div class="lbl">מזוזות</div></div>
+<div class="stat-card"><div class="num" id="stat-income">—</div><div class="lbl">הכנסה צפויה (₪)</div></div>
+</div>
+<div id="table-wrap"><p class="empty">טוען...</p></div>
+</div>
 
-  <div id="table-wrap">
-    <p class="empty">טוען...</p>
-  </div>
+<!-- Edit Modal -->
+<div class="modal-backdrop" id="edit-modal">
+<div class="modal">
+<h2>עריכת רישום</h2>
+<input type="hidden" id="edit-id" />
+<label>שם מלא</label>
+<input type="text" id="edit-name" />
+<label>טלפון</label>
+<input type="tel" id="edit-phone" />
+<label>מייל</label>
+<input type="email" id="edit-email" />
+<div class="modal-btns">
+<button class="btn btn-grey" onclick="closeModal()">ביטול</button>
+<button class="btn btn-blue" onclick="saveEdit()">שמור</button>
+</div>
+</div>
 </div>
 
 <script>
 const key = new URLSearchParams(location.search).get("key") || "";
 
 async function load() {
-  const res  = await fetch("/api/admin/appointments?key=" + key);
-  if (!res.ok) { document.getElementById("table-wrap").innerHTML = "<p class='empty'>גישה נדחתה</p>"; return; }
-  const list = await res.json();
+const res = await fetch("/api/admin/appointments?key=" + key);
+if (!res.ok) { document.getElementById("table-wrap").innerHTML = "<p class='empty'>גישה נדחתה</p>"; return; }
+const list = await res.json();
+document.getElementById("stat-people").textContent = list.length;
+const totalMez = list.reduce((s, a) => s + a.qty, 0);
+document.getElementById("stat-mezuzot").textContent = totalMez;
+document.getElementById("stat-income").textContent = totalMez * 20;
+if (list.length === 0) { document.getElementById("table-wrap").innerHTML = "<p class='empty'>אין רישומים עדיין</p>"; return; }
+const rows = list.map(a => `
+<tr>
+<td>${a.startTime}</td>
+<td>${a.name}</td>
+<td>${a.phone}</td>
+<td>${a.email || "—"}</td>
+<td>${a.qty}</td>
+<td>${a.price} ₪</td>
+<td style="display:flex;gap:6px">
+<button class="btn btn-blue" onclick="openEdit('${a.id}','${a.name}','${a.phone}','${a.email||''}')">עריכה</button>
+<button class="btn btn-red" onclick="del('${a.id}')">מחק</button>
+</td>
+</tr>
+`).join("");
+document.getElementById("table-wrap").innerHTML = `
+<table>
+<thead><tr>
+<th>שעת כניסה</th><th>שם</th><th>טלפון</th><th>מייל</th><th>מזוזות</th><th>מחיר</th><th></th>
+</tr></thead>
+<tbody>${rows}</tbody>
+</table>
+`;
+}
 
-  document.getElementById("stat-people").textContent  = list.length;
-  const totalMez = list.reduce((s, a) => s + a.qty, 0);
-  document.getElementById("stat-mezuzot").textContent = totalMez;
-  document.getElementById("stat-income").textContent  = totalMez * 20;
+function openEdit(id, name, phone, email) {
+document.getElementById("edit-id").value = id;
+document.getElementById("edit-name").value = name;
+document.getElementById("edit-phone").value = phone;
+document.getElementById("edit-email").value = email;
+document.getElementById("edit-modal").classList.add("open");
+}
 
-  if (list.length === 0) {
-    document.getElementById("table-wrap").innerHTML = "<p class='empty'>אין רישומים עדיין</p>";
-    return;
-  }
+function closeModal() {
+document.getElementById("edit-modal").classList.remove("open");
+}
 
-  const rows = list.map(a => `
-    <tr>
-      <td>${a.startTime}</td>
-      <td>${a.endTime}</td>
-      <td>${a.name}</td>
-      <td>${a.phone}</td>
-      <td>${a.email || "—"}</td>
-      <td>${a.qty}</td>
-      <td>${a.price} ₪</td>
-      <td><button class="btn btn-red" onclick="del('${a.id}')">מחק</button></td>
-    </tr>
-  `).join("");
-
-  document.getElementById("table-wrap").innerHTML = `
-    <table>
-      <thead><tr>
-        <th>שעת כניסה</th><th>שעת יציאה</th><th>שם</th>
-        <th>טלפון</th><th>מייל</th><th>מזוזות</th><th>מחיר</th><th></th>
-      </tr></thead>
-      <tbody>${rows}</tbody>
-    </table>
-  `;
+async function saveEdit() {
+const id = document.getElementById("edit-id").value;
+const name = document.getElementById("edit-name").value.trim();
+const phone = document.getElementById("edit-phone").value.trim();
+const email = document.getElementById("edit-email").value.trim();
+const res = await fetch("/api/admin/appointment/" + id + "?key=" + key, {
+method: "PATCH",
+headers: { "Content-Type": "application/json" },
+body: JSON.stringify({ name, phone, email })
+});
+if (res.ok) { closeModal(); load(); }
+else { alert("שגיאה בשמירה"); }
 }
 
 async function del(id) {
-  if (!confirm("למחוק רישום זה?")) return;
-  await fetch("/api/admin/appointment/" + id + "?key=" + key, { method: "DELETE" });
-  load();
+if (!confirm("למחוק רישום זה?")) return;
+await fetch("/api/admin/appointment/" + id + "?key=" + key, { method: "DELETE" });
+load();
 }
 
-function exportCsv() {
-  location.href = "/api/admin/export?key=" + key;
-}
+function exportCsv() { location.href = "/api/admin/export?key=" + key; }
+
+document.getElementById("edit-modal").addEventListener("click", function(e) {
+if (e.target === this) closeModal();
+});
 
 load();
 </script>
