@@ -82,7 +82,7 @@ const list = await res.json();
 document.getElementById("stat-people").textContent = list.length;
 const totalMez = list.reduce((s, a) => s + a.qty, 0);
 document.getElementById("stat-mezuzot").textContent = totalMez;
-document.getElementById("stat-income").textContent = totalMez * 20;
+document.getElementById("stat-income").textContent = list.reduce((s,a)=>s+a.price,0);
 if (list.length === 0) { document.getElementById("table-wrap").innerHTML = "<p class='empty'>אין רישומים עדיין</p>"; return; }
 const rows = list.map(a => `
 <tr>
@@ -92,6 +92,7 @@ const rows = list.map(a => `
 <td>${a.email || "—"}</td>
 <td>${a.qty}</td>
 <td>${a.price} ₪</td>
+<td>${a.delivery ? 'כן — '+a.address : 'לא'}</td>
 <td style="display:flex;gap:6px">
 <button class="btn btn-blue" onclick="openEdit('${a.id}','${a.name}','${a.phone}','${a.email||''}')">עריכה</button>
 <button class="btn btn-red" onclick="del('${a.id}')">מחק</button>
@@ -101,7 +102,7 @@ const rows = list.map(a => `
 document.getElementById("table-wrap").innerHTML = `
 <table>
 <thead><tr>
-<th>שעת כניסה</th><th>שם</th><th>טלפון</th><th>מייל</th><th>מזוזות</th><th>מחיר</th><th></th>
+<th>שעת כניסה</th><th>שם</th><th>טלפון</th><th>מייל</th><th>מזוזות</th><th>מחיר</th><th>משלוח</th><th></th>
 </tr></thead>
 <tbody>${rows}</tbody>
 </table>
