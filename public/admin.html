@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>× ×××× â ××××§×ª ××××××ª</title>
+  <title>ניהול — בדיקת מזוזות</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: "Segoe UI", Arial, sans-serif; direction: rtl; background: #f5f0e8; }
@@ -23,28 +23,27 @@
     td { padding: 10px 12px; border-bottom: 1px solid #eee; font-size: .9rem; vertical-align: middle; }
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: #f9f9f9; }
-    .actions { display: flex; gap: 8px; margin-bottom: 16px; }
     .empty { text-align: center; padding: 40px; color: #888; }
   </style>
 </head>
 <body>
 <header>
-  <h1>ð × ×××× â ××××§×ª ××××××ª</h1>
+  <h1>📜 ניהול — בדיקת מזוזות</h1>
   <div style="display:flex;gap:10px">
-    <button class="btn btn-green" onclick="exportCsv()">×××¦×× CSV</button>
-    <button class="btn btn-grey"  onclick="location.href='/'">×××ª×¨</button>
+    <button class="btn btn-green" onclick="exportCsv()">ייצוא CSV</button>
+    <button class="btn btn-grey"  onclick="location.href='/'">לאתר</button>
   </div>
 </header>
 
 <div class="content">
   <div class="stats">
-    <div class="stat-card"><div class="num" id="stat-people">â</div><div class="lbl">× ×¨×©×××</div></div>
-    <div class="stat-card"><div class="num" id="stat-mezuzot">â</div><div class="lbl">××××××ª</div></div>
-    <div class="stat-card"><div class="num" id="stat-income">â</div><div class="lbl">××× ×¡× ××¥××× (âª)</div></div>
+    <div class="stat-card"><div class="num" id="stat-people">—</div><div class="lbl">נרשמים</div></div>
+    <div class="stat-card"><div class="num" id="stat-mezuzot">—</div><div class="lbl">מזוזות</div></div>
+    <div class="stat-card"><div class="num" id="stat-income">—</div><div class="lbl">הכנסה מץויה (₪)</div></div>
   </div>
 
   <div id="table-wrap">
-    <p class="empty">×××¢×...</p>
+    <p class="empty">טוען...</p>
   </div>
 </div>
 
@@ -52,8 +51,8 @@
 const key = new URLSearchParams(location.search).get("key") || "";
 
 async function load() {
-  const res  = await fetch(`/api/admin/appointments?key=${key}`);
-  if (!res.ok) { document.getElementById("table-wrap").innerHTML = "<p class='empty'>×××©× × ×××ª×</p>"; return; }
+  const res  = await fetch("/api/admin/appointments?key=" + key);
+  if (!res.ok) { document.getElementById("table-wrap").innerHTML = "<p class='empty'>גישה נדחתה</p>"; return; }
   const list = await res.json();
 
   document.getElementById("stat-people").textContent  = list.length;
@@ -62,7 +61,7 @@ async function load() {
   document.getElementById("stat-income").textContent  = totalMez * 20;
 
   if (list.length === 0) {
-    document.getElementById("table-wrap").innerHTML = "<p class='empty'>××× ×¨××©×××× ×¢××××</p>";
+    document.getElementById("table-wrap").innerHTML = "<p class='empty'>אין רישומים עדיין</p>";
     return;
   }
 
@@ -72,18 +71,18 @@ async function load() {
       <td>${a.endTime}</td>
       <td>${a.name}</td>
       <td>${a.phone}</td>
-      <td>${a.email || "â"}</td>
+      <td>${a.email || "—"}</td>
       <td>${a.qty}</td>
-      <td>${a.price} âª</td>
-      <td><button class="btn btn-red" onclick="del('${a.id}')">×××§</button></td>
+      <td>${a.price} ₪</td>
+      <td><button class="btn btn-red" onclick="del('${a.id}')">מחק</button></td>
     </tr>
   `).join("");
 
   document.getElementById("table-wrap").innerHTML = `
     <table>
       <thead><tr>
-        <th>×©×¢×ª ×× ××¡×</th><th>×©×¢×ª ××¦×××</th><th>×©×</th>
-        <th>×××¤××</th><th>××××</th><th>××××××ª</th><th>××××¨</th><th></th>
+        <th>שעת כניסה</th><th>שעת יציאה</th><th>שם</th>
+        <th>טלפון</th><th>מייל</th><th>מזוזות</th><th>מחיר</th><th></th>
       </tr></thead>
       <tbody>${rows}</tbody>
     </table>
@@ -91,13 +90,13 @@ async function load() {
 }
 
 async function del(id) {
-  if (!confirm("×××××§ ×¨××©×× ××?")) return;
-  await fetch(`/api/admin/appointment/${id}?key=${key}`, { method: "DELETE" });
+  if (!confirm("למחוק רישום זה?")) return;
+  await fetch("/api/admin/appointment/" + id + "?key=" + key, { method: "DELETE" });
   load();
 }
 
 function exportCsv() {
-  location.href = `/api/admin/export?key=${key}`;
+  location.href = "/api/admin/export?key=" + key;
 }
 
 load();
