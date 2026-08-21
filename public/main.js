@@ -90,7 +90,7 @@ btnSubmit.addEventListener("click", async () => {
     document.getElementById("success-screen").style.display = "block";
     document.getElementById("appt-summary").innerHTML =
       "<strong>שם:</strong> " + a.name + "<br>" +
-      "<strong>שעה:</strong> " + a.startTime + " – " + a.endTime + "<br>" +
+      "<strong>שעה:</strong> " + a.startTime + "<br>" +
       "<strong>מזוזות:</strong> " + a.qty + "<br>" +
       "<strong>מחיר לתשלום במקום:</strong> " + a.price + " ₪";
   } catch {
