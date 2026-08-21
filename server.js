@@ -2,7 +2,6 @@ require("dotenv").config();
 const express = require("express");
 const path = require("path");
 const { v4: uuid } = require("uuid");
-const nodemailer = require("nodemailer");
 const config = require("./config");
 const store = require("./lib/store");
 const { sendSms } = require("./lib/sms");
@@ -23,15 +22,30 @@ function toTime(m) {
 function adminOk(req) {
   return req.query.key === process.env.ADMIN_KEY;
 }
+function normalizePhone(phone) {
+  const digits = phone.replace(/\D/g, "");
+  if (digits.startsWith("972")) return digits;
+  if (digits.startsWith("0")) return "972" + digits.slice(1);
+  return "972" + digits;
+}
 
 async function sendEmail(to, subject, html) {
-  const user = process.env.GMAIL_USER;
-  const pass = process.env.GMAIL_APP_PASSWORD;
-  if (!user || !pass) { console.warn("[email] credentials not set"); return; }
-  const t = nodemailer.createTransport({ service:"gmail", auth:{ user, pass } });
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) { console.warn("[email] RESEND_API_KEY not set"); return; }
   try {
-    await t.sendMail({ from: '"בית חב"ד נוף העמק" <'+user+'>', to, subject, html });
-    console.log("[email] sent to:", to);
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { "Authorization": "Bearer " + apiKey, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        from: "Chabad Nof HaEmek <onboarding@resend.dev>",
+        to: [to],
+        subject,
+        html,
+      }),
+    });
+    const json = await res.json();
+    if (json.id) console.log("[email] sent id:", json.id);
+    else console.error("[email] fail:", JSON.stringify(json));
   } catch(e) { console.error("[email] error:", e.message); }
 }
 
@@ -88,17 +102,11 @@ app.post("/api/register", async (req, res) => {
       createdAt: new Date().toISOString(),
     };
     await store.add(appt);
-    const smsMsg = [
-      "שלום "+name+",",
-      "רישומך לבדיקת מזוזות התקבל!",
-      config.event.date,
-      "שעה: "+startTime,
-      "מזוזות: "+qtyN+" | מחיר: "+appt.price+" ₪",
-      config.event.location,
-    ].join("\n");
-    sendSms(phone, smsMsg).catch(console.error);
+    const normalPhone = normalizePhone(phone);
+    const smsMsg = "שלום "+name+", רישומך לבדיקת מזוזות התקבל! "+config.event.date+" שעה: "+startTime+" | "+qtyN+" מזוזות | "+appt.price+" ש\"ח";
+    sendSms(normalPhone, smsMsg).catch(console.error);
     const emailHtml = '<div dir="rtl" style="font-family:Arial;font-size:15px">'
-      +'<h2>אישור רישום לבדיקת מזוזות</h2>'
+      +'<h2 style="color:#800020">אישור רישום לבדיקת מזוזות</h2>'
       +'<p>שלום <strong>'+name+'</strong>,</p>'
       +'<p>רישומך לבדיקת מזוזות התקבל בהצלחה!</p>'
       +'<table style="border-collapse:collapse;width:100%;max-width:400px">'
@@ -106,7 +114,6 @@ app.post("/api/register", async (req, res) => {
       +'<tr><td style="padding:6px;border:1px solid #ddd"><strong>שעה</strong></td><td style="padding:6px;border:1px solid #ddd">'+startTime+'</td></tr>'
       +'<tr><td style="padding:6px;border:1px solid #ddd"><strong>כמות מזוזות</strong></td><td style="padding:6px;border:1px solid #ddd">'+qtyN+'</td></tr>'
       +'<tr><td style="padding:6px;border:1px solid #ddd"><strong>מחיר</strong></td><td style="padding:6px;border:1px solid #ddd">'+appt.price+' ₪</td></tr>'
-      +'<tr><td style="padding:6px;border:1px solid #ddd"><strong>מיקום</strong></td><td style="padding:6px;border:1px solid #ddd">'+config.event.location+'</td></tr>'
       +'</table>'
       +'<p style="margin-top:16px;color:#800020"><strong>נא להגיע עם קלפי המזוזות בלבד — ללא בתי המזוזה.</strong></p>'
       +'<p>בברכה,<br>בית חב"ד נוף העמק</p>'
