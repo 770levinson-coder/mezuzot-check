@@ -234,3 +234,22 @@ footer {
   color: #fff;
   font-weight: bold;
 }
+
+/* Fix jump when changing qty */
+.slot-grid {
+  min-height: 52px;
+}
+
+/* Delivery checkbox */
+.delivery-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  cursor: pointer;
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+.delivery-label input[type="checkbox"] {
+  flex-shrink: 0;
+  margin-top: 3px;
+}
