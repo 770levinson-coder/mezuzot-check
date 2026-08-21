@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>× ×××× â ××××§×ª ××××××ª</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI", Arial, sans-serif; direction: rtl; background: #f5f0e8; }
+    header { background: #1a3a2a; color: #fff; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; }
+    header h1 { font-size: 1.3rem; }
+    .btn { padding: 8px 18px; border-radius: 8px; border: none; cursor: pointer; font-size: .9rem; font-weight: 600; }
+    .btn-green { background: #2e6644; color: #fff; }
+    .btn-red   { background: #c0392b; color: #fff; }
+    .btn-grey  { background: #aaa; color: #fff; }
+    .content { padding: 20px; max-width: 900px; margin: 0 auto; }
+    .stats { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+    .stat-card { background: #fff; border-radius: 10px; padding: 16px 24px; box-shadow: 0 1px 6px rgba(0,0,0,.1); text-align: center; }
+    .stat-card .num { font-size: 2rem; font-weight: bold; color: #1a3a2a; }
+    .stat-card .lbl { font-size: .85rem; color: #666; }
+    table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,.1); }
+    th { background: #2e6644; color: #fff; padding: 10px 12px; font-size: .9rem; }
+    td { padding: 10px 12px; border-bottom: 1px solid #eee; font-size: .9rem; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f9f9f9; }
+    .actions { display: flex; gap: 8px; margin-bottom: 16px; }
+    .empty { text-align: center; padding: 40px; color: #888; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>ð × ×××× â ××××§×ª ××××××ª</h1>
+  <div style="display:flex;gap:10px">
+    <button class="btn btn-green" onclick="exportCsv()">×××¦×× CSV</button>
+    <button class="btn btn-grey"  onclick="location.href='/'">×××ª×¨</button>
+  </div>
+</header>
+
+<div class="content">
+  <div class="stats">
+    <div class="stat-card"><div class="num" id="stat-people">â</div><div class="lbl">× ×¨×©×××</div></div>
+    <div class="stat-card"><div class="num" id="stat-mezuzot">â</div><div class="lbl">××××××ª</div></div>
+    <div class="stat-card"><div class="num" id="stat-income">â</div><div class="lbl">××× ×¡× ××¥××× (âª)</div></div>
+  </div>
+
+  <div id="table-wrap">
+    <p class="empty">×××¢×...</p>
+  </div>
+</div>
+
+<script>
+const key = new URLSearchParams(location.search).get("key") || "";
+
+async function load() {
+  const res  = await fetch(`/api/admin/appointments?key=${key}`);
+  if (!res.ok) { document.getElementById("table-wrap").innerHTML = "<p class='empty'>×××©× × ×××ª×</p>"; return; }
+  const list = await res.json();
+
+  document.getElementById("stat-people").textContent  = list.length;
+  const totalMez = list.reduce((s, a) => s + a.qty, 0);
+  document.getElementById("stat-mezuzot").textContent = totalMez;
+  document.getElementById("stat-income").textContent  = totalMez * 20;
+
+  if (list.length === 0) {
+    document.getElementById("table-wrap").innerHTML = "<p class='empty'>××× ×¨××©×××× ×¢××××</p>";
+    return;
+  }
+
+  const rows = list.map(a => `
+    <tr>
+      <td>${a.startTime}</td>
+      <td>${a.endTime}</td>
+      <td>${a.name}</td>
+      <td>${a.phone}</td>
+      <td>${a.email || "â"}</td>
+      <td>${a.qty}</td>
+      <td>${a.price} âª</td>
+      <td><button class="btn btn-red" onclick="del('${a.id}')">×××§</button></td>
+    </tr>
+  `).join("");
+
+  document.getElementById("table-wrap").innerHTML = `
+    <table>
+      <thead><tr>
+        <th>×©×¢×ª ×× ××¡×</th><th>×©×¢×ª ××¦×××</th><th>×©×</th>
+        <th>×××¤××</th><th>××××</th><th>××××××ª</th><th>××××¨</th><th></th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+}
+
+async function del(id) {
+  if (!confirm("×××××§ ×¨××©×× ××?")) return;
+  await fetch(`/api/admin/appointment/${id}?key=${key}`, { method: "DELETE" });
+  load();
+}
+
+function exportCsv() {
+  location.href = `/api/admin/export?key=${key}`;
+}
+
+load();
+</script>
+</body>
+</html>
