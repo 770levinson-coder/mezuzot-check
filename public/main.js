@@ -3,10 +3,10 @@ const MAX_QTY = 10;
 const MIN_QTY = 1;
 let selectedSlot = null;
 
-const qtyDisplay   = document.getElementById("qty-display");
-const slotGrid     = document.getElementById("slot-grid");
-const btnSubmit    = document.getElementById("btn-submit");
-const errorMsg     = document.getElementById("error-msg");
+const qtyDisplay = document.getElementById("qty-display");
+const slotGrid   = document.getElementById("slot-grid");
+const btnSubmit  = document.getElementById("btn-submit");
+const errorMsg   = document.getElementById("error-msg");
 
 document.getElementById("qty-minus").addEventListener("click", () => {
   if (qty > MIN_QTY) { qty--; onQtyChange(); }
@@ -38,13 +38,24 @@ function renderSlots(slots) {
     slotGrid.innerHTML = '<span class="no-slots">אין שעות פנויות לכמות זו</span>';
     return;
   }
-  slotGrid.innerHTML = slots.map(s =>
-    '<button class="slot-btn" onclick="selectSlot(\'' + s + '\')">' + s + '</button>'
-  ).join("");
+  slotGrid.innerHTML =
+    '<button type="button" class="slot-trigger" id="slot-trigger" onclick="toggleSlotList()">לחץ לבחירת שעה ▼</button>' +
+    '<div class="slot-dropdown" id="slot-dropdown">' +
+    slots.map(s => '<button type="button" class="slot-btn" onclick="selectSlot(\'' + s + '\')">' + s + '</button>').join('') +
+    '</div>';
+}
+
+function toggleSlotList() {
+  const dd = document.getElementById('slot-dropdown');
+  if (dd) dd.classList.toggle('open');
 }
 
 function selectSlot(s) {
   selectedSlot = s;
+  const trigger = document.getElementById('slot-trigger');
+  if (trigger) trigger.textContent = 'שעה נבחרה: ' + s + ' ✓';
+  const dd = document.getElementById('slot-dropdown');
+  if (dd) dd.classList.remove('open');
   document.querySelectorAll(".slot-btn").forEach(b => {
     b.classList.toggle("selected", b.textContent.trim() === s);
   });
@@ -63,7 +74,8 @@ btnSubmit.addEventListener("click", async () => {
 
   if (!name)  { errorMsg.textContent = "נא להזין שם"; return; }
   if (!phone) { errorMsg.textContent = "נא להזין טלפון"; return; }
-    if (!email)  { errorMsg.textContent = "נא להזין אימייל"; return; }
+  if (!email) { errorMsg.textContent = "נא להזין אימייל"; return; }
+  if (!selectedSlot) { errorMsg.textContent = "נא לבחור שעה"; return; }
 
   btnSubmit.disabled = true;
   btnSubmit.textContent = "שולח...";
