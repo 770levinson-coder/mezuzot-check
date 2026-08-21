@@ -10,7 +10,7 @@ body {
 
 /* ââ header ââ */
 .site-header {
-  background: #5dade2;
+  background: #F07820;
   color: #fff;
   text-align: center;
   padding: 28px 16px 20px;
@@ -20,8 +20,8 @@ body {
 
 /* ââ info bar ââ */
 .info-bar {
-  background: #2e86c1;
-  color: #fff;
+  background: #D96A0A;
+  color: #800020;
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
