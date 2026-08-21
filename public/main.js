@@ -4,7 +4,6 @@ const MIN_QTY = 1;
 let selectedSlot = null;
 
 const qtyDisplay   = document.getElementById("qty-display");
-const durationNote = document.getElementById("duration-note");
 const slotGrid     = document.getElementById("slot-grid");
 const btnSubmit    = document.getElementById("btn-submit");
 const errorMsg     = document.getElementById("error-msg");
@@ -18,8 +17,6 @@ document.getElementById("qty-plus").addEventListener("click", () => {
 
 function onQtyChange() {
   qtyDisplay.textContent = qty;
-  const mins = qty * 4;
-  durationNote.textContent = "משך הבדיקה: ~" + mins + " דקות";
   selectedSlot = null;
   updateSubmitBtn();
   loadSlots();
@@ -66,6 +63,7 @@ btnSubmit.addEventListener("click", async () => {
 
   if (!name)  { errorMsg.textContent = "נא להזין שם"; return; }
   if (!phone) { errorMsg.textContent = "נא להזין טלפון"; return; }
+    if (!email)  { errorMsg.textContent = "נא להזין אימייל"; return; }
 
   btnSubmit.disabled = true;
   btnSubmit.textContent = "שולח...";
