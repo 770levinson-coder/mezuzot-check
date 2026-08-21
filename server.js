@@ -114,6 +114,7 @@ app.post("/api/register", async (req, res) => {
       +'<tr><td style="padding:6px;border:1px solid #ddd"><strong>שעה</strong></td><td style="padding:6px;border:1px solid #ddd">'+startTime+'</td></tr>'
       +'<tr><td style="padding:6px;border:1px solid #ddd"><strong>כמות מזוזות</strong></td><td style="padding:6px;border:1px solid #ddd">'+qtyN+'</td></tr>'
       +'<tr><td style="padding:6px;border:1px solid #ddd"><strong>מחיר</strong></td><td style="padding:6px;border:1px solid #ddd">'+appt.price+' ₪</td></tr>'
+      +'<tr><td style="padding:6px;border:1px solid #ddd"><strong>מיקום</strong></td><td style="padding:6px;border:1px solid #ddd">בית חב"ד נוף העמק (במרכז המסחרי ליד מולטי סרוויס)</td></tr>'
       +'</table>'
       +'<p style="margin-top:16px;color:#800020"><strong>נא להגיע עם קלפי המזוזות בלבד — ללא בתי המזוזה.</strong></p>'
       +'<p>בברכה,<br>בית חב"ד נוף העמק</p>'
