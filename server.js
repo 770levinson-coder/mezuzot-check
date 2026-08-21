@@ -47,7 +47,7 @@ app.get("/api/slots", (req, res) => {
 
 app.post("/api/register", async (req, res) => {
   const { name, phone, email, qty, startTime } = req.body;
-  if (!name || !phone || !qty || !startTime)
+  if (!name || !phone || !email || !qty || !startTime)
     return res.status(400).json({ error: "chasrim partim" });
   const qtyN = parseInt(qty, 10);
   if (qtyN < 1 || qtyN > config.event.maxPerPerson)
