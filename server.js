@@ -109,4 +109,17 @@ app.get("/api/admin/export", (req, res) => {
   res.setHeader("Content-Disposition", 'attachment; filename="mezuzot.csv"');
   res.send("\uFEFF" + [header, ...rows].join("\n"));
 });
+
+app.patch("/api/admin/appointment/:id", (req, res) => {
+  if (!adminOk(req)) return res.status(403).send("Forbidden");
+  const all = store.all();
+  const appt = all[req.params.id];
+  if (!appt) return res.status(404).json({ error: "not found" });
+  const { name, phone, email } = req.body;
+  if (name) appt.name = name;
+  if (phone) appt.phone = phone;
+  if (email !== undefined) appt.email = email;
+  store.add(appt);
+  res.json({ ok: true, appt });
+});
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
