@@ -75,9 +75,11 @@ app.get("/api/slots", async (req, res) => {
 
 app.post("/api/register", async (req, res) => {
   try {
-    const { name, phone, email, qty, startTime } = req.body;
+    const { name, phone, email, qty, startTime, delivery, address } = req.body;
     if (!name || !phone || !email || !qty || !startTime)
       return res.status(400).json({ error:"chasrim partim" });
+    if (delivery && !address)
+      return res.status(400).json({ error:"chasra ktovet lemishloach" });
     const qtyN = parseInt(qty, 10);
     if (qtyN < 1 || qtyN > config.event.maxPerPerson)
       return res.status(400).json({ error:"kamut lo takana" });
@@ -95,24 +97,29 @@ app.post("/api/register", async (req, res) => {
     const busy = occupied.some(o => !(tEnd <= o.start || tStart >= o.end));
     if (busy) return res.status(409).json({ error:"hashaa tefusa - ana bacher acheret" });
     const endTime = toTime(tEnd);
+    const basePrice = qtyN * config.event.pricePerMezuza;
+    const deliveryFee = delivery ? 60 : 0;
     const appt = {
       id: uuid(), name, phone, email: email||"",
       qty: qtyN, startTime, endTime,
-      price: qtyN * config.event.pricePerMezuza,
+      price: basePrice + deliveryFee,
+      delivery: !!delivery,
+      address: delivery ? address : "",
       createdAt: new Date().toISOString(),
     };
     await store.add(appt);
     const normalPhone = normalizePhone(phone);
     const dayName = config.event.date.split(",")[0].trim();
     const secDate = config.event.date.split(",")[1].trim();
-    const smsMsg = "שלום "+name+", רישומך לבדיקת מזוזות התקבל!\n"
+    let smsMsg = "שלום "+name+", רישומך לבדיקת מזוזות התקבל!\n"
       +"יום "+dayName+", "+config.event.hebrewDate+", "+secDate+"\n"
       +"שעה: "+startTime+" | "+qtyN+" מזוזות\n"
-      +config.event.location+"\n"
-      +"052-2577704";
+      +"מיקום: "+config.event.location+"\n";
+    if (delivery) smsMsg += "משלוח: "+address+"\n";
+    smsMsg += "052-2577704";
     sendSms(normalPhone, smsMsg).catch(console.error);
     const td = '<td style="padding:6px;border:1px solid #ddd">';
-    const emailHtml = '<div dir="rtl" style="font-family:Arial;font-size:15px">'
+    let emailHtml = '<div dir="rtl" style="font-family:Arial;font-size:15px">'
       +'<h2 style="color:#800020">אישור רישום לבדיקת מזוזות</h2>'
       +'<p>שלום <strong>'+name+'</strong>,</p>'
       +'<p>רישומך לבדיקת מזוזות התקבל בהצלחה!</p>'
@@ -120,9 +127,10 @@ app.post("/api/register", async (req, res) => {
       +'<tr>'+td+'<strong>תאריך</strong></td>'+td+'יום '+dayName+', '+config.event.hebrewDate+', '+secDate+'</td></tr>'
       +'<tr>'+td+'<strong>שעה</strong></td>'+td+startTime+'</td></tr>'
       +'<tr>'+td+'<strong>כמות מזוזות</strong></td>'+td+qtyN+'</td></tr>'
-      +'<tr>'+td+'<strong>מחיר</strong></td>'+td+appt.price+' ₪</td></tr>'
-      +'<tr>'+td+'<strong>מיקום</strong></td>'+td+config.event.location+' (במרכז המסחרי ליד מולטי סרוויס)</td></tr>'
-      +'<tr>'+td+'<strong>טלפון לפרטים</strong></td>'+td+'052-2577704</td></tr>'
+      +'<tr>'+td+'<strong>מחיר</strong></td>'+td+appt.price+' ₪'+(delivery?' (כולל משלוח 60 ₪)':'')+'</td></tr>'
+      +'<tr>'+td+'<strong>מיקום</strong></td>'+td+config.event.location+' (במרכז המסחרי ליד מולטי סרוויס)</td></tr>';
+    if (delivery) emailHtml += '<tr>'+td+'<strong>משלוח לכתובת</strong></td>'+td+address+'</td></tr>';
+    emailHtml += '<tr>'+td+'<strong>טלפון לפרטים</strong></td>'+td+'052-2577704</td></tr>'
       +'</table>'
       +'<p style="margin-top:16px;color:#800020"><strong>נא להגיע עם קלפי המזוזות בלבד — ללא בתי המזוזה.</strong></p>'
       +'<p>בברכה,<br>בית חב\"ד נוף העמק</p>'
@@ -172,8 +180,8 @@ app.get("/api/admin/export", async (req, res) => {
   if (!adminOk(req)) return res.status(403).send("Forbidden");
   try {
     const list = Object.values(await store.all()).sort((a,b) => toMin(a.startTime)-toMin(b.startTime));
-    const header = "שם,טלפון,מייל,מזוזות,שעת כניסה,שעת סיום,מחיר,נרשם ב";
-    const rows = list.map(a => [a.name,a.phone,a.email,a.qty,a.startTime,a.endTime,a.price,a.createdAt].join(","));
+    const header = "שם,טלפון,מייל,מזוזות,שעת כניסה,שעת סיום,מחיר,משלוח,כתובת,נרשם ב";
+    const rows = list.map(a => [a.name,a.phone,a.email,a.qty,a.startTime,a.endTime,a.price,a.delivery?'כן':'לא',a.address||'',a.createdAt].join(","));
     res.setHeader("Content-Type","text/csv; charset=utf-8");
     res.setHeader("Content-Disposition",'attachment; filename="mezuzot.csv"');
     res.send("\uFEFF"+[header,...rows].join("\n"));
