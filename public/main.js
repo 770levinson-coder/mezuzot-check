@@ -62,29 +62,37 @@ function selectSlot(s) {
   updateSubmitBtn();
 }
 
+function toggleDelivery() {
+  const checked = document.getElementById('chk-delivery').checked;
+  document.getElementById('address-group').style.display = checked ? 'block' : 'none';
+}
+
 function updateSubmitBtn() {
   btnSubmit.disabled = !selectedSlot;
 }
 
 btnSubmit.addEventListener("click", async () => {
   errorMsg.textContent = "";
-  const name  = document.getElementById("inp-name").value.trim();
-  const phone = document.getElementById("inp-phone").value.trim();
-  const email = document.getElementById("inp-email").value.trim();
+  const name    = document.getElementById("inp-name").value.trim();
+  const phone   = document.getElementById("inp-phone").value.trim();
+  const email   = document.getElementById("inp-email").value.trim();
+  const delivery = document.getElementById("chk-delivery").checked;
+  const address = delivery ? document.getElementById("inp-address").value.trim() : "";
 
   if (!name)  { errorMsg.textContent = "נא להזין שם"; return; }
   if (!phone) { errorMsg.textContent = "נא להזין טלפון"; return; }
   if (!email) { errorMsg.textContent = "נא להזין אימייל"; return; }
   if (!selectedSlot) { errorMsg.textContent = "נא לבחור שעה"; return; }
+  if (delivery && !address) { errorMsg.textContent = "נא להזין כתובת למשלוח"; return; }
 
   btnSubmit.disabled = true;
   btnSubmit.textContent = "שולח...";
 
   try {
-    const res  = await fetch("/api/register", {
-      method:  "POST",
+    const res = await fetch("/api/register", {
+      method: "POST",
       headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify({ name, phone, email, qty, startTime: selectedSlot }),
+      body: JSON.stringify({ name, phone, email, qty, startTime: selectedSlot, delivery, address }),
     });
     const data = await res.json();
 
@@ -100,11 +108,13 @@ btnSubmit.addEventListener("click", async () => {
     const a = data.appt;
     document.getElementById("form-card").style.display = "none";
     document.getElementById("success-screen").style.display = "block";
-    document.getElementById("appt-summary").innerHTML =
+    let summary =
       "<strong>שם:</strong> " + a.name + "<br>" +
       "<strong>שעה:</strong> " + a.startTime + "<br>" +
       "<strong>מזוזות:</strong> " + a.qty + "<br>" +
       "<strong>מחיר לתשלום במקום:</strong> " + a.price + " ₪";
+    if (a.delivery) summary += "<br><strong>משלוח לכתובת:</strong> " + a.address;
+    document.getElementById("appt-summary").innerHTML = summary;
   } catch {
     errorMsg.textContent = "שגיאת רשת";
     btnSubmit.disabled = false;
