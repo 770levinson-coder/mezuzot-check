@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>××××§×ª ××××××ª â ×××ª ××"× × ××£ ××¢××§</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+
+<header class="site-header">
+  <h1>ð ××××§×ª ××××××ª</h1>
+  <div class="subtitle">
+    ×××ª ××"× × ××£ ××¢××§<br>
+    ×¨×××¢×, ×"× ×××× ×ª×©×¤"× | 9.9.2026 | 16:00â20:30
+  </div>
+</header>
+
+<div class="info-bar">
+  <span>ð ×××ª ××"× × ××£ ××¢××§</span>
+  <span>ð 9 ××¡×¤××××¨ 2026</span>
+  <span>ð 16:00 â 20:30</span>
+</div>
+
+<div style="max-width:520px; margin: 18px auto; padding: 0 12px;">
+  <div class="price-note">
+    ð° <strong>××××¨: 20 âª ×××××§×ª ×××××</strong> â ×ª×©××× ×××§××
+  </div>
+</div>
+
+<!-- Registration form -->
+<div class="card" id="form-card">
+  <h2>××¨×©×× ××ª××¨ ×××××§×</h2>
+
+  <!-- Step 1: qty -->
+  <div class="form-group">
+    <label>××× ××××××ª ××© ××?</label>
+    <div class="qty-stepper">
+      <button type="button" id="qty-minus">â</button>
+      <span class="qty-val" id="qty-display">1</span>
+      <button type="button" id="qty-plus">+</button>
+    </div>
+    <div class="duration-note" id="duration-note">××©× ×××××§×: ~4 ××§××ª</div>
+  </div>
+
+  <!-- Step 2: slot selection -->
+  <div class="slot-section">
+    <h3>×××¨ ×©×¢× ×¤× ×××:</h3>
+    <div class="slot-grid" id="slot-grid">
+      <span class="slot-loading">×××¢× ×©×¢××ª...</span>
+    </div>
+  </div>
+
+  <!-- Step 3: personal details -->
+  <div class="form-group">
+    <label for="inp-name">×©× ×××</label>
+    <input type="text" id="inp-name" placeholder="××©×¨×× ××©×¨×××" autocomplete="name" />
+  </div>
+  <div class="form-group">
+    <label for="inp-phone">×××¤××</label>
+    <input type="tel" id="inp-phone" placeholder="05XXXXXXXX" autocomplete="tel" />
+  </div>
+  <div class="form-group">
+    <label for="inp-email">×××× <span style="font-weight:400;color:#888">(×× ××××)</span></label>
+    <input type="email" id="inp-email" placeholder="name@example.com" autocomplete="email" />
+  </div>
+
+  <button class="btn-submit" id="btn-submit" disabled>×©×× ×¨××©××</button>
+  <div class="error-msg" id="error-msg"></div>
+</div>
+
+<!-- Success screen -->
+<div class="card" id="success-screen">
+  <div class="check-icon">â</div>
+  <h2>××¨××©×× ××ª×§××!</h2>
+  <p>×¤×¨×× ××ª××¨ × ×©××× ×-SMS ×××¡×¤×¨×.</p>
+  <div class="appt-summary" id="appt-summary"></div>
+  <p style="color:#555; font-size:.9rem;">× × ×××××¢ ×¢× ×××××××ª ××©×§××ª ××××¡×¤×¨×ª / ××¡××× ×ª ××¤× ×××¨××.</p>
+</div>
+
+<footer>×××ª ××"× × ××£ ××¢××§ &nbsp;|&nbsp; ××××§×ª ××××××ª ×ª×©×¤"×</footer>
+
+<script src="/main.js"></script>
+</body>
+</html>
