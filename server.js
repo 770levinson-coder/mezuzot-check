@@ -103,21 +103,23 @@ app.post("/api/register", async (req, res) => {
     };
     await store.add(appt);
     const normalPhone = normalizePhone(phone);
-    const smsMsg = "שלום "+name+", רישומך לבדיקת מזוזות התקבל! "+config.event.date+" שעה: "+startTime+" | "+qtyN+" מזוזות | "+appt.price+" ש\"ח";
+    const smsMsg = "שלום "+name+", רישומך לבדיקת מזוזות התקבל! "+config.event.date+" | שעה: "+startTime+" | "+qtyN+" מזוזות | "+appt.price+" ש\"ח | לפרטים: 052-2577704";
     sendSms(normalPhone, smsMsg).catch(console.error);
+    const phone_td = '<td style="padding:6px;border:1px solid #ddd">';
     const emailHtml = '<div dir="rtl" style="font-family:Arial;font-size:15px">'
       +'<h2 style="color:#800020">אישור רישום לבדיקת מזוזות</h2>'
       +'<p>שלום <strong>'+name+'</strong>,</p>'
       +'<p>רישומך לבדיקת מזוזות התקבל בהצלחה!</p>'
-      +'<table style="border-collapse:collapse;width:100%;max-width:400px">'
-      +'<tr><td style="padding:6px;border:1px solid #ddd"><strong>תאריך</strong></td><td style="padding:6px;border:1px solid #ddd">'+config.event.date+'</td></tr>'
-      +'<tr><td style="padding:6px;border:1px solid #ddd"><strong>שעה</strong></td><td style="padding:6px;border:1px solid #ddd">'+startTime+'</td></tr>'
-      +'<tr><td style="padding:6px;border:1px solid #ddd"><strong>כמות מזוזות</strong></td><td style="padding:6px;border:1px solid #ddd">'+qtyN+'</td></tr>'
-      +'<tr><td style="padding:6px;border:1px solid #ddd"><strong>מחיר</strong></td><td style="padding:6px;border:1px solid #ddd">'+appt.price+' ₪</td></tr>'
-      +'<tr><td style="padding:6px;border:1px solid #ddd"><strong>מיקום</strong></td><td style="padding:6px;border:1px solid #ddd">בית חב"ד נוף העמק (במרכז המסחרי ליד מולטי סרוויס)</td></tr>'
+      +'<table style="border-collapse:collapse;width:100%;max-width:420px">'
+      +'<tr>'+phone_td+'<strong>תאריך</strong></td>'+phone_td+config.event.date+'</td></tr>'
+      +'<tr>'+phone_td+'<strong>שעה</strong></td>'+phone_td+startTime+'</td></tr>'
+      +'<tr>'+phone_td+'<strong>כמות מזוזות</strong></td>'+phone_td+qtyN+'</td></tr>'
+      +'<tr>'+phone_td+'<strong>מחיר</strong></td>'+phone_td+appt.price+' ₪</td></tr>'
+      +'<tr>'+phone_td+'<strong>מיקום</strong></td>'+phone_td+'בית חב\"ד נוף העמק (במרכז המסחרי ליד מולטי סרוויס)</td></tr>'
+      +'<tr>'+phone_td+'<strong>טלפון לפרטים</strong></td>'+phone_td+'052-2577704</td></tr>'
       +'</table>'
       +'<p style="margin-top:16px;color:#800020"><strong>נא להגיע עם קלפי המזוזות בלבד — ללא בתי המזוזה.</strong></p>'
-      +'<p>בברכה,<br>בית חב"ד נוף העמק</p>'
+      +'<p>בברכה,<br>בית חב\"ד נוף העמק</p>'
       +'</div>';
     sendEmail(email, "אישור רישום לבדיקת מזוזות", emailHtml).catch(console.error);
     res.json({ ok:true, appt });
