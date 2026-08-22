@@ -76,6 +76,8 @@ tr.cancelled td { background:#d0d0d0 !important; }
     <div class="stat"><div class="num" id="s-mezuzot">—</div><div class="lbl">מזוזות</div></div>
     <div class="stat"><div class="num" id="s-delivery">—</div><div class="lbl">משלוח</div></div>
     <div class="stat"><div class="num" id="s-paid">—</div><div class="lbl">שילמו</div></div>
+    <div class="stat"><div class="num" id="s-insp">—</div><div class="lbl">נבדקו (מזוזות)</div></div>
+    <div class="stat"><div class="num" id="s-remain">—</div><div class="lbl">נשאר לבדיקה</div></div>
     <button id="refresh-btn" onclick="loadData()">🔄</button>
   </div>
 
@@ -125,6 +127,10 @@ function updateStats() {
   document.getElementById('s-mezuzot').textContent = allData.reduce((s,a)=>s+a.qty,0);
   document.getElementById('s-delivery').textContent = allData.filter(a=>a.delivery).length;
   document.getElementById('s-paid').textContent = allData.filter(a=>a.paid).length;
+  const inspMez = allData.filter(a=>!a.cancelled && a.inspected).reduce((s,a)=>s+a.qty,0);
+  const remainMez = allData.filter(a=>!a.cancelled && !a.inspected).reduce((s,a)=>s+a.qty,0);
+  document.getElementById('s-insp').textContent = inspMez;
+  document.getElementById('s-remain').textContent = remainMez;
 }
 
 function isDone(a) {
