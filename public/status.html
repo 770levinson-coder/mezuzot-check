@@ -5,38 +5,63 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>סטטוס בדיקות מזוזות</title>
 <style>
-  * { box-sizing: border-box; }
-  body { font-family: 'Segoe UI', Arial, sans-serif; background:#f0f0f0; margin:0; padding:16px; direction:rtl; }
-  h1 { color:#F58C28; text-align:center; font-size:22px; margin-bottom:4px; }
-  .subtitle { text-align:center; color:#666; font-size:13px; margin-bottom:16px; }
-  #login-box { background:#fff; max-width:360px; margin:60px auto; border-radius:12px; padding:28px; box-shadow:0 2px 12px rgba(0,0,0,.12); text-align:center; }
-  #login-box input { width:100%; padding:10px; border:1px solid #ccc; border-radius:8px; font-size:16px; margin:10px 0; }
-  #login-box button { width:100%; padding:12px; background:#F58C28; color:#fff; border:none; border-radius:8px; font-size:16px; cursor:pointer; }
-  .stats { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
-  .stat { background:#fff; border-radius:8px; padding:10px 16px; flex:1; min-width:100px; text-align:center; box-shadow:0 1px 4px rgba(0,0,0,.08); }
-  .stat .num { font-size:22px; font-weight:700; color:#F58C28; }
-  .stat .lbl { font-size:12px; color:#888; }
-  .tbl-wrap { overflow-x:auto; }
-  table { width:100%; border-collapse:collapse; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 1px 6px rgba(0,0,0,.08); min-width:700px; }
-  th { background:#F58C28; color:#fff; padding:10px 8px; font-size:13px; white-space:nowrap; }
-  td { padding:9px 8px; border-bottom:1px solid #eee; font-size:13px; text-align:center; }
-  tr:last-child td { border-bottom:none; }
-  tr:hover td { background:#fff8f0; }
-  .chk { width:20px; height:20px; cursor:pointer; accent-color:#F58C28; }
-  .name-col { text-align:right; font-weight:600; }
-  .badge { display:inline-block; padding:2px 8px; border-radius:12px; font-size:11px; font-weight:600; }
-  .badge.yes { background:#d4edda; color:#155724; }
-  .badge.no { background:#f8d7da; color:#721c24; }
-  #refresh-btn { float:left; padding:8px 16px; background:#F58C28; color:#fff; border:none; border-radius:8px; cursor:pointer; font-size:13px; }
-  .filter-bar { margin-bottom:12px; }
-  .filter-bar input { padding:8px 12px; border:1px solid #ccc; border-radius:8px; font-size:14px; width:240px; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Segoe UI',Arial,sans-serif; background:#f0f0f0; padding:16px; direction:rtl; }
+h1 { color:#F58C28; text-align:center; font-size:20px; margin-bottom:4px; }
+.subtitle { text-align:center; color:#666; font-size:12px; margin-bottom:14px; }
+
+/* Login */
+#login-box { background:#fff; max-width:340px; margin:60px auto; border-radius:12px; padding:24px; box-shadow:0 2px 12px rgba(0,0,0,.12); text-align:center; }
+#login-box h2 { color:#F58C28; font-size:18px; margin-bottom:12px; }
+#login-box input { width:100%; padding:10px; border:1px solid #ccc; border-radius:8px; font-size:15px; margin:6px 0 12px; }
+#login-box button { width:100%; padding:11px; background:#F58C28; color:#fff; border:none; border-radius:8px; font-size:15px; cursor:pointer; }
+
+/* Stats */
+.stats { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
+.stat { background:#fff; border-radius:8px; padding:8px 14px; flex:1; min-width:80px; text-align:center; box-shadow:0 1px 4px rgba(0,0,0,.08); }
+.stat .num { font-size:20px; font-weight:700; color:#F58C28; }
+.stat .lbl { font-size:11px; color:#888; }
+#refresh-btn { padding:8px 14px; background:#F58C28; color:#fff; border:none; border-radius:8px; cursor:pointer; font-size:13px; align-self:center; }
+
+/* Search */
+.filter-bar { margin-bottom:12px; }
+.filter-bar input { padding:8px 12px; border:1px solid #ccc; border-radius:8px; font-size:14px; width:100%; max-width:280px; }
+
+/* ===== DESKTOP TABLE ===== */
+.tbl-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 1px 6px rgba(0,0,0,.08); min-width:640px; }
+th { background:#F58C28; color:#fff; padding:9px 6px; font-size:12px; white-space:nowrap; }
+td { padding:8px 6px; border-bottom:1px solid #eee; font-size:12px; text-align:center; }
+tr:last-child td { border-bottom:none; }
+.name-col { text-align:right; font-weight:600; }
+.chk { width:18px; height:18px; cursor:pointer; accent-color:#F58C28; }
+.chk-disabled { opacity:0.2; cursor:default; pointer-events:none; }
+tr.done td { background:#d0d0d0 !important; }
+tr.cancelled td { background:#d0d0d0 !important; }
+
+/* ===== MOBILE CARDS ===== */
+.cards { display:none; }
+.card { background:#fff; border-radius:10px; padding:12px; margin-bottom:10px; box-shadow:0 1px 5px rgba(0,0,0,.09); }
+.card.done, .card.cancelled { background:#d0d0d0; }
+.card-header { font-weight:700; font-size:15px; margin-bottom:6px; }
+.card-meta { font-size:12px; color:#666; margin-bottom:10px; }
+.card-fields { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.card-field { display:flex; flex-direction:column; align-items:center; font-size:11px; color:#444; gap:3px; }
+.card-field .chk { width:22px; height:22px; }
+.card-field.hidden-field { opacity:0.2; pointer-events:none; }
+.card-field.cancelled-field { }
+
+@media (max-width:640px) {
+  .tbl-wrap { display:none; }
+  .cards { display:block; }
+}
 </style>
 </head>
 <body>
 
 <div id="login-box">
-  <h2 style="color:#F58C28;margin-top:0">📜 דף סטטוס – בדיקת מזוזות</h2>
-  <p style="color:#555;font-size:14px">נדרש מפתח כניסה</p>
+  <h2>📜 דף סטטוס</h2>
+  <p style="color:#555;font-size:13px;margin-bottom:8px">נדרש מפתח כניסה</p>
   <input type="password" id="key-input" placeholder="מפתח ניהול" />
   <button onclick="doLogin()">כניסה</button>
   <div id="login-err" style="color:red;margin-top:8px;font-size:13px"></div>
@@ -44,32 +69,35 @@
 
 <div id="main" style="display:none">
   <h1>📋 סטטוס בדיקות מזוזות</h1>
-  <div class="subtitle">עדכן סטטוס עבור כל רשמה — השינויים נשמרים אוטומטית</div>
+  <div class="subtitle">שינויים נשמרים אוטומטית</div>
 
   <div class="stats">
     <div class="stat"><div class="num" id="s-total">—</div><div class="lbl">רשומים</div></div>
     <div class="stat"><div class="num" id="s-mezuzot">—</div><div class="lbl">מזוזות</div></div>
     <div class="stat"><div class="num" id="s-delivery">—</div><div class="lbl">משלוח</div></div>
     <div class="stat"><div class="num" id="s-paid">—</div><div class="lbl">שילמו</div></div>
-    <div class="stat"><div class="num" id="s-income">—</div><div class="lbl">הכנסה (₪)</div></div>
-    <button id="refresh-btn" onclick="loadData()">🔄 רענן</button>
+    <button id="refresh-btn" onclick="loadData()">🔄</button>
   </div>
 
   <div class="filter-bar">
-    <input type="text" id="search" placeholder="חיפוש לפי שם / טלפון..." oninput="renderTable()" />
+    <input type="text" id="search" placeholder="חיפוש לפי שם / טלפון..." oninput="renderAll()" />
   </div>
 
+  <!-- Desktop table -->
   <div class="tbl-wrap">
     <table>
       <thead>
         <tr>
-          <th>שם</th><th>טלפון</th><th>שעה</th><th>מזוזות</th><th>משלוח</th>
-          <th>נאספו</th><th>נבדקו</th><th>הוחזרו</th><th>שולם</th>
+          <th>שם</th><th>טל'</th><th>שעה</th><th>מזוזות</th><th>משלוח</th>
+          <th>נאספו</th><th>נבדקו</th><th>הוחזרו</th><th>שולם</th><th>בוטל</th>
         </tr>
       </thead>
       <tbody id="tbody"></tbody>
     </table>
   </div>
+
+  <!-- Mobile cards -->
+  <div class="cards" id="cards"></div>
 </div>
 
 <script>
@@ -85,44 +113,83 @@ async function loadData() {
   const r = await fetch('/api/admin/appointments?key='+encodeURIComponent(adminKey));
   if (!r.ok) { document.getElementById('login-err').textContent = 'מפתח שגוי'; return; }
   const data = await r.json();
-  allData = Object.values(data).sort((a,b) => a.startTime.localeCompare(b.startTime));
+  allData = Object.values(data).sort((a,b) => (a.startTime||'').localeCompare(b.startTime||''));
   document.getElementById('login-box').style.display = 'none';
   document.getElementById('main').style.display = 'block';
   updateStats();
-  renderTable();
+  renderAll();
 }
 
 function updateStats() {
-  const total = allData.length;
-  const mezuzot = allData.reduce((s,a)=>s+a.qty,0);
-  const delivery = allData.filter(a=>a.delivery).length;
-  const paid = allData.filter(a=>a.paid).length;
-  const income = allData.reduce((s,a)=>s+a.price,0);
-  document.getElementById('s-total').textContent = total;
-  document.getElementById('s-mezuzot').textContent = mezuzot;
-  document.getElementById('s-delivery').textContent = delivery;
-  document.getElementById('s-paid').textContent = paid;
-  document.getElementById('s-income').textContent = income;
+  document.getElementById('s-total').textContent = allData.length;
+  document.getElementById('s-mezuzot').textContent = allData.reduce((s,a)=>s+a.qty,0);
+  document.getElementById('s-delivery').textContent = allData.filter(a=>a.delivery).length;
+  document.getElementById('s-paid').textContent = allData.filter(a=>a.paid).length;
 }
 
-function renderTable() {
+function isDone(a) {
+  if (a.cancelled) return true;
+  const base = a.inspected && a.paid;
+  if (a.delivery) return base && a.collected && a.returned;
+  return base;
+}
+
+function filtered() {
   const q = document.getElementById('search').value.toLowerCase();
-  const rows = allData.filter(a =>
-    !q || a.name?.toLowerCase().includes(q) || a.phone?.includes(q)
-  );
-  const tbody = document.getElementById('tbody');
-  tbody.innerHTML = rows.map(a => `
-    <tr>
+  return allData.filter(a => !q || (a.name||'').toLowerCase().includes(q) || (a.phone||'').includes(q));
+}
+
+function renderAll() { renderTable(); renderCards(); }
+
+function renderTable() {
+  const rows = filtered();
+  document.getElementById('tbody').innerHTML = rows.map(a => {
+    const done = isDone(a);
+    const cls = a.cancelled ? 'cancelled' : (done ? 'done' : '');
+    const noDelivery = !a.delivery;
+    function chk(field) {
+      const disabled = noDelivery && (field==='collected'||field==='returned');
+      if (disabled) return '<td><span style="color:#ccc">—</span></td>';
+      return `<td><input type="checkbox" class="chk" ${a[field]?'checked':''} onchange="setStatus('${a.id}','${field}',this.checked,this)"></td>`;
+    }
+    return `<tr class="${cls}">
       <td class="name-col">${a.name||''}</td>
       <td>${a.phone||''}</td>
-      <td dir="ltr">${a.startTime}–${a.endTime}</td>
+      <td dir="ltr" style="white-space:nowrap">${a.startTime}–${a.endTime}</td>
       <td>${a.qty}</td>
-      <td>${a.delivery ? '<span class=\"badge yes\">כן</span>' : '<span class=\"badge no\">לא</span>'}</td>
-      ${['collected','inspected','returned','paid'].map(f => `
-        <td><input type="checkbox" class="chk" ${a[f]?'checked':''} onchange="setStatus('${a.id}','${f}',this.checked,this)"></td>
-      `).join('')}
-    </tr>
-  `).join('');
+      <td>${a.delivery?'✓':'—'}</td>
+      ${chk('collected')}${chk('inspected')}${chk('returned')}${chk('paid')}
+      <td><input type="checkbox" class="chk" ${a.cancelled?'checked':''} onchange="setStatus('${a.id}','cancelled',this.checked,this)"></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderCards() {
+  const rows = filtered();
+  document.getElementById('cards').innerHTML = rows.map(a => {
+    const done = isDone(a);
+    const cls = a.cancelled ? 'cancelled' : (done ? 'done' : '');
+    const fields = [
+      { key:'collected', label:'נאספו', hidden: !a.delivery },
+      { key:'inspected', label:'נבדקו', hidden: false },
+      { key:'returned',  label:'הוחזרו', hidden: !a.delivery },
+      { key:'paid',      label:'שולם',  hidden: false },
+      { key:'cancelled', label:'בוטל',  hidden: false },
+    ];
+    return `<div class="card ${cls}">
+      <div class="card-header">${a.name||''}</div>
+      <div class="card-meta">${a.phone||''} | ${a.qty} מזוזות | ${a.startTime}–${a.endTime}${a.delivery?' | משלוח':''}</div>
+      <div class="card-fields">
+        ${fields.map(f => `
+          <div class="card-field ${f.hidden?'hidden-field':''}">
+            <input type="checkbox" class="chk" ${a[f.key]?'checked':''} ${f.hidden?'disabled':''}
+              onchange="setStatus('${a.id}','${f.key}',this.checked,this)">
+            <span>${f.label}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+  }).join('');
 }
 
 async function setStatus(id, field, value, el) {
@@ -134,6 +201,7 @@ async function setStatus(id, field, value, el) {
   const appt = allData.find(a => a.id === id);
   if (appt) appt[field] = value;
   updateStats();
+  renderAll();
 }
 
 document.getElementById('key-input').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
