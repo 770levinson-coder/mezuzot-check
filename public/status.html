@@ -163,7 +163,7 @@ function renderTable() {
       <td>${a.phone||''}</td>
       <td dir="ltr" style="white-space:nowrap">${a.startTime}–${a.endTime}</td>
       <td>${a.qty}</td>
-      <td>${a.delivery?'✓':'—'}</td>
+      <td>${a.delivery?('✓ <small style="color:#555">'+a.address+'</small>'):'—'}</td>
       ${chk('collected')}${chk('inspected')}${chk('returned')}${chk('paid')}
       <td><input type="checkbox" class="chk" ${a.cancelled?'checked':''} onchange="setStatus('${a.id}','cancelled',this.checked,this)"></td>
     </tr>`;
@@ -184,7 +184,7 @@ function renderCards() {
     ];
     return `<div class="card ${cls}">
       <div class="card-header">${a.name||''}</div>
-      <div class="card-meta">${a.phone||''} | ${a.qty} מזוזות | ${a.startTime}–${a.endTime}${a.delivery?' | משלוח':''}</div>
+      <div class="card-meta">${a.phone||''} | ${a.qty} מזוזות | ${a.startTime}–${a.endTime}${a.delivery?' | משלוח: '+a.address:''}</div>
       <div class="card-fields">
         ${fields.map(f => `
           <div class="card-field ${f.hidden?'hidden-field':''}">
