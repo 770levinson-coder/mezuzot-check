@@ -98,7 +98,7 @@ app.post("/api/register", async (req, res) => {
     if (busy) return res.status(409).json({ error:"hashaa tefusa - ana bacher acheret" });
     const endTime = toTime(tEnd);
     const basePrice = qtyN * config.event.pricePerMezuza;
-    const deliveryFee = delivery ? 60 : 0;
+    const deliveryFee = delivery ? 30 : 0;
     const appt = {
       id: uuid(), name, phone, email: email||"",
       qty: qtyN, startTime, endTime,
@@ -108,6 +108,7 @@ app.post("/api/register", async (req, res) => {
       createdAt: new Date().toISOString(),
     };
     await store.add(appt);
+    const editUrl = `${req.protocol}://${req.get('host')}/edit?id=${appt.id}`;
     const normalPhone = normalizePhone(phone);
     const dayName = config.event.date.split(",")[0].trim();
     const secDate = config.event.date.split(",")[1].trim();
@@ -116,6 +117,7 @@ app.post("/api/register", async (req, res) => {
       +"שעה: "+startTime+" | "+qtyN+" מזוזות\n"
       +"מיקום: "+config.event.location+"\n";
     if (delivery) smsMsg += "משלוח: "+address+"\n";
+        smsMsg += "לשינוי פרטים: "+editUrl+"\n";
     smsMsg += "052-2577704";
     sendSms(normalPhone, smsMsg).catch(console.error);
     const td = '<td style="padding:6px;border:1px solid #ddd">';
@@ -133,6 +135,7 @@ app.post("/api/register", async (req, res) => {
     emailHtml += '<tr>'+td+'<strong>טלפון לפרטים</strong></td>'+td+'052-2577704</td></tr>'
       +'</table>'
       +'<p style="margin-top:16px;color:#800020"><strong>נא להגיע עם קלפי המזוזות בלבד — ללא בתי המזוזה.</strong></p>'
+            +'<p style="margin-top:12px"><a href="'+editUrl+'">לשינוי פרטי ההרשמה לחצ/י כאן</a></p>'
       +'<p>בברכה,<br>בית חב\"ד נוף העמק</p>'
       +'</div>';
     sendEmail(email, "אישור רישום לבדיקת מזוזות", emailHtml).catch(console.error);
@@ -186,6 +189,60 @@ app.get("/api/admin/export", async (req, res) => {
     res.setHeader("Content-Disposition",'attachment; filename="mezuzot.csv"');
     res.send("\uFEFF"+[header,...rows].join("\n"));
   } catch(e) { res.status(500).json({ error:"server error" }); }
+});
+
+
+// Get appointment by ID (for edit page)
+app.get("/api/appt/:id", async (req, res) => {
+  try {
+    const appts = await store.all();
+    const appt = appts[req.params.id];
+    if (!appt) return res.status(404).json({ error: "not found" });
+    res.json({ id: appt.id, name: appt.name, startTime: appt.startTime, endTime: appt.endTime, qty: appt.qty, delivery: appt.delivery });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// Edit appointment
+app.post("/api/edit/:id", async (req, res) => {
+  try {
+    const appts = await store.all();
+    const appt = appts[req.params.id];
+    if (!appt) return res.status(404).json({ error: "not found" });
+    const { startTime, endTime, qty } = req.body;
+    const qtyN = parseInt(qty);
+    if (!startTime || !endTime || !qtyN || qtyN < 1 || qtyN > config.event.maxPerPerson)
+      return res.status(400).json({ error: "invalid" });
+    const basePrice = qtyN * config.event.pricePerMezuza;
+    const deliveryFee = appt.delivery ? 30 : 0;
+    const updated = { ...appt, startTime, endTime, qty: qtyN, price: basePrice + deliveryFee };
+    await store.add(updated);
+    res.json({ ok: true });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// Update status field (for status page)
+app.patch("/api/status/:id", async (req, res) => {
+  try {
+    const appts = await store.all();
+    const appt = appts[req.params.id];
+    if (!appt) return res.status(404).json({ error: "not found" });
+    const { field, value } = req.body;
+    const allowed = ['collected','inspected','returned','paid'];
+    if (!allowed.includes(field)) return res.status(400).json({ error: "invalid field" });
+    const updated = { ...appt, [field]: !!value };
+    await store.add(updated);
+    res.json({ ok: true });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// Serve status page
+app.get("/status", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "status.html"));
+});
+
+// Serve edit page
+app.get("/edit", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "edit.html"));
 });
 
 app.listen(PORT, () => console.log("Server running on port "+PORT));
