@@ -92,7 +92,7 @@ btnSubmit.addEventListener("click", async () => {
     const res = await fetch("/api/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, phone, email, qty, startTime: selectedSlot, delivery, address }),
+      body: JSON.stringify({ name, phone, email, qty, startTime: selectedSlot, delivery, address, notes: (document.getElementById('inp-notes')?.value||'').trim() }),
     });
     const data = await res.json();
 
