@@ -37,16 +37,22 @@ const id = params.get('id');
 if (!id) { document.getElementById('current-info').textContent = 'קישור לא תקין.'; document.getElementById('edit-form').style.display='none'; }
 
 let currentAppt = null;
+let eventConfig = null;
 
 async function init() {
   if (!id) return;
+
+  // Fetch event config for minutesPerMezuza
+  const ec = await fetch('/api/event');
+  eventConfig = await ec.json();
+
   const r = await fetch('/api/appt/'+id);
   if (!r.ok) { document.getElementById('current-info').textContent = 'לא נמצאה הרשמה.'; document.getElementById('edit-form').style.display='none'; return; }
   currentAppt = await r.json();
 
   document.getElementById('current-info').innerHTML =
-    'שלום <strong>'+currentAppt.name+'</strong>,<br>פרטי ההרשמה הנוכחיים שלך:<br>'+
-    currentAppt.qty+' מזוזות | שעה: '+currentAppt.startTime+'–'+currentAppt.endTime;
+    'שלום <strong>'+currentAppt.name+'</strong>,<br>'+
+    'הרשמה נוכחית: <strong>'+currentAppt.qty+'</strong> מזוזות | שעה: <strong>'+currentAppt.startTime+'–'+currentAppt.endTime+'</strong>';
 
   // Fill qty options
   const qtyEl = document.getElementById('qty-select');
@@ -57,24 +63,48 @@ async function init() {
     qtyEl.appendChild(o);
   }
 
-  // Fill slot options
+  // Load slots for current qty
+  await loadSlots(currentAppt.qty);
+
+  qtyEl.addEventListener('change', () => loadSlots(parseInt(qtyEl.value)));
+}
+
+function toMin(t) { const [h,m] = t.split(':').map(Number); return h*60+m; }
+function toTime(m) { return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0'); }
+
+async function loadSlots(qty) {
   const slotEl = document.getElementById('slot-select');
-  const sr = await fetch('/api/slots');
-  const slots = await sr.json();
-  slots.forEach(s => {
+  slotEl.innerHTML = '<option>טוען שעות...</option>';
+  const r = await fetch('/api/slots?qty='+qty);
+  let starts = [];
+  if (r.ok) {
+    const data = await r.json();
+    starts = data.slots || [];
+  }
+  // Always include current slot
+  if (currentAppt && !starts.includes(currentAppt.startTime)) {
+    starts.unshift(currentAppt.startTime);
+  }
+  slotEl.innerHTML = '';
+  const mpp = (eventConfig && eventConfig.minutesPerMezuza) || 4;
+  starts.forEach(st => {
+    const endTime = toTime(toMin(st) + qty * mpp);
     const o = document.createElement('option');
-    o.value = s.start+'|'+s.end;
-    o.textContent = s.start+'–'+s.end + (s.available === 0 ? ' (מלא)' : '');
-    if (s.start === currentAppt.startTime && s.end === currentAppt.endTime) o.selected = true;
-    if (s.available === 0 && !(s.start === currentAppt.startTime)) o.disabled = true;
+    o.value = st+'|'+endTime;
+    o.textContent = st+'–'+endTime;
+    if (st === currentAppt.startTime) o.selected = true;
     slotEl.appendChild(o);
   });
+  if (slotEl.options.length === 0) {
+    slotEl.innerHTML = '<option disabled>אין שעות פנויות לכמות זו</option>';
+  }
 }
 
 document.getElementById('edit-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const qty = parseInt(document.getElementById('qty-select').value);
-  const [startTime, endTime] = document.getElementById('slot-select').value.split('|');
+  const parts = document.getElementById('slot-select').value.split('|');
+  const startTime = parts[0], endTime = parts[1];
   const r = await fetch('/api/edit/'+id, {
     method:'POST', headers:{'Content-Type':'application/json'},
     body: JSON.stringify({ qty, startTime, endTime })
@@ -82,11 +112,11 @@ document.getElementById('edit-form').addEventListener('submit', async (e) => {
   const msgEl = document.getElementById('msg');
   if (r.ok) {
     msgEl.className='msg ok'; msgEl.textContent='הפרטים עודכנו בהצלחה!';
-    currentAppt = { ...currentAppt, qty, startTime, endTime };
     document.getElementById('current-info').innerHTML =
-      'שלום <strong>'+currentAppt.name+'</strong>,<br>'+qty+' מזוזות | שעה: '+startTime+'–'+endTime;
+      'שלום <strong>'+currentAppt.name+'</strong>,<br>'+
+      'הרשמה מעודכנת: <strong>'+qty+'</strong> מזוזות | שעה: <strong>'+startTime+'–'+endTime+'</strong>';
   } else {
-    const err = await r.json();
+    const err = await r.json().catch(()=>({}));
     msgEl.className='msg err'; msgEl.textContent='שגיאה: '+(err.error||'נסה שוב');
   }
 });
