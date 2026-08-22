@@ -21,7 +21,8 @@
 
 <div style="max-width:520px; margin: 18px auto; padding: 0 12px;">
   <div class="price-note">
-    💰 <strong>מחיר: 20 ₪ לבדיקת מזוזה</strong> — תשלום במקום
+    אתם מביאים אלינו את המזוזות — אנחנו בודקים במקום ומחזירים אותן באותו יום.<br>
+    💰 עלות בדיקה: <strong>20 ש"ח למזוזה</strong>, כולל בדיקת מחשב | תשלום במקום
   </div>
 </div>
 
@@ -73,7 +74,12 @@
     <input type="text" id="inp-address" placeholder="רחוב, מספר בית, קומה" />
   </div>
 
-  <button class="btn-submit" id="btn-submit" disabled>שלח רישום</button>
+  <div class="form-group">
+    <label for="inp-notes">הערות <span style="color:#888;font-weight:normal;font-size:13px">(לא חובה)</span></label>
+    <textarea id="inp-notes" rows="2" placeholder="כל הערה רלוונטית..." style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:15px;resize:vertical;font-family:inherit;box-sizing:border-box"></textarea>
+  </div>
+
+    <button class="btn-submit" id="btn-submit" disabled>שלח רישום</button>
   <div class="error-msg" id="error-msg"></div>
 </div>
 
