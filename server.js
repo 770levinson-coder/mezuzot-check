@@ -76,7 +76,7 @@ app.get("/api/slots", async (req, res) => {
 app.post("/api/register", async (req, res) => {
   try {
     const { name, phone, email, qty, startTime, delivery, address, notes } = req.body;
-    if (!name || !phone || !email || !qty || !startTime)
+    if (!name || !phone || !email || !qty || (!startTime && !delivery))
       return res.status(400).json({ error:"chasrim partim" });
     if (delivery && !address)
       return res.status(400).json({ error:"chasra ktovet lemishloach" });
@@ -84,24 +84,28 @@ app.post("/api/register", async (req, res) => {
     if (qtyN < 1 || qtyN > config.event.maxPerPerson)
       return res.status(400).json({ error:"kamut lo takana" });
     const duration = qtyN * config.event.minutesPerMezuza;
-    const tStart = toMin(startTime);
-    const tEnd = tStart + duration;
-    const startMin = toMin(config.event.startTime);
-    const endMin = toMin(config.event.endTime);
-    if (tStart < startMin || tEnd > endMin)
-      return res.status(400).json({ error:"shaa lo takana" });
-    const occupied = Object.values(await store.all()).map(a => ({
-      start: toMin(a.startTime),
-      end: toMin(a.startTime) + a.qty * config.event.minutesPerMezuza,
-    }));
-    const busy = occupied.some(o => !(tEnd <= o.start || tStart >= o.end));
-    if (busy) return res.status(409).json({ error:"hashaa tefusa - ana bacher acheret" });
-    const endTime = toTime(tEnd);
+    let endTime = '—';
+    let apptStart = delivery ? '—' : startTime;
+    if (!delivery) {
+      const tStart = toMin(startTime);
+      const tEnd = tStart + duration;
+      const startMin = toMin(config.event.startTime);
+      const endMin = toMin(config.event.endTime);
+      if (tStart < startMin || tEnd > endMin)
+        return res.status(400).json({ error:"shaa lo takana" });
+      const occupied = Object.values(await store.all()).map(a => ({
+        start: toMin(a.startTime),
+        end: toMin(a.startTime) + a.qty * config.event.minutesPerMezuza,
+      }));
+      const busy = occupied.some(o => !(tEnd <= o.start || tStart >= o.end));
+      if (busy) return res.status(409).json({ error:"hashaa tefusa - ana bacher acheret" });
+      endTime = toTime(tEnd);
+    }
     const basePrice = qtyN * config.event.pricePerMezuza;
     const deliveryFee = delivery ? 30 : 0;
     const appt = {
       id: uuid(), name, phone, email: email||"",
-      qty: qtyN, startTime, endTime,
+      qty: qtyN, startTime: apptStart, endTime,
       price: basePrice + deliveryFee,
       delivery: !!delivery,
       address: delivery ? address : "",
