@@ -30,6 +30,21 @@
 <div class="card" id="form-card">
   <h2>הרשמה לתור לבדיקה</h2>
 
+  <!-- Step 0: delivery choice -->
+  <div class="form-group">
+    <label style="font-weight:600">אופן קבלת השירות:</label>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:10px">
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:normal">
+        <input type="radio" name="delivery-mode" value="self" onchange="setDeliveryMode(false)" checked style="width:18px;height:18px;accent-color:#800020" />
+        <span>אביא את המזוזות אלינו</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:normal">
+        <input type="radio" name="delivery-mode" value="delivery" onchange="setDeliveryMode(true)" style="width:18px;height:18px;accent-color:#800020" />
+        <span>שירות הגעה לבית <small style="color:#888">(תוספת 30 ₪)</small></span>
+      </label>
+    </div>
+  </div>
+
   <!-- Step 1: qty -->
   <div class="form-group">
     <label>כמה מזוזות יש לך?</label>
@@ -40,12 +55,14 @@
     </div>
   </div>
 
+  <div id="slot-wrap">
   <!-- Step 2: slot selection -->
   <div class="slot-section">
     <h3>בחר שעה פנויה:</h3>
     <div class="slot-grid" id="slot-grid">
       <span class="slot-loading">טוען שעות...</span>
     </div>
+  </div>
   </div>
 
   <!-- Step 3: personal details -->
@@ -62,13 +79,6 @@
     <input type="email" id="inp-email" placeholder="name@example.com" autocomplete="email" />
   </div>
 
-  <div class="form-group" id="delivery-group">
-    <label class="delivery-label">
-      <input type="checkbox" id="chk-delivery" onchange="toggleDelivery()" style="margin-left:8px;width:16px;height:16px;cursor:pointer;">
-      מעוניין בשירות איסוף והחזרת המזוזות עד הבית<br>
-      <small style="color:#666;white-space:nowrap">(בעלות נוספת של 30 ש"ח)</small>
-    </label>
-  </div>
   <div class="form-group" id="address-group" style="display:none">
     <label for="inp-address">כתובת מדויקת <span style="color:#c00">*</span></label>
     <input type="text" id="inp-address" placeholder="רחוב, מספר בית, קומה" />
