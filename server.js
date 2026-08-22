@@ -75,7 +75,7 @@ app.get("/api/slots", async (req, res) => {
 
 app.post("/api/register", async (req, res) => {
   try {
-    const { name, phone, email, qty, startTime, delivery, address } = req.body;
+    const { name, phone, email, qty, startTime, delivery, address, notes } = req.body;
     if (!name || !phone || !email || !qty || !startTime)
       return res.status(400).json({ error:"chasrim partim" });
     if (delivery && !address)
@@ -105,6 +105,7 @@ app.post("/api/register", async (req, res) => {
       price: basePrice + deliveryFee,
       delivery: !!delivery,
       address: delivery ? address : "",
+      notes: notes || "",
       createdAt: new Date().toISOString(),
     };
     await store.add(appt);
