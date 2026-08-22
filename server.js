@@ -227,7 +227,7 @@ app.patch("/api/status/:id", async (req, res) => {
     const appt = appts[req.params.id];
     if (!appt) return res.status(404).json({ error: "not found" });
     const { field, value } = req.body;
-    const allowed = ['collected','inspected','returned','paid'];
+    const allowed = ['collected','inspected','returned','paid','cancelled'];
     if (!allowed.includes(field)) return res.status(400).json({ error: "invalid field" });
     const updated = { ...appt, [field]: !!value };
     await store.add(updated);
