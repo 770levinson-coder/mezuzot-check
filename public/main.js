@@ -112,7 +112,8 @@ btnSubmit.addEventListener("click", async () => {
       "<strong>שם:</strong> " + a.name + "<br>" +
       "<strong>שעה:</strong> " + a.startTime + "<br>" +
       "<strong>מזוזות:</strong> " + a.qty + "<br>" +
-      "<strong>מחיר לתשלום במקום:</strong> " + a.price + " ₪";
+      (a.delivery ? "<strong>שירות הגעה לבית:</strong> 30 ₪<br>" : "") +
+      "<strong>סה\"כ לתשלום:</strong> " + a.price + " ₪";
     if (a.delivery) summary += "<br><strong>משלוח לכתובת:</strong> " + a.address;
     document.getElementById("appt-summary").innerHTML = summary;
   } catch {
