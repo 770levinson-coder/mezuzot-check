@@ -91,7 +91,7 @@ async function loadSlots(qty) {
     const endTime = toTime(toMin(st) + qty * mpp);
     const o = document.createElement('option');
     o.value = st+'|'+endTime;
-    o.textContent = st+'–'+endTime;
+    o.textContent = st;
     if (st === currentAppt.startTime) o.selected = true;
     slotEl.appendChild(o);
   });
