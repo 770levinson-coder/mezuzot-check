@@ -2,6 +2,7 @@ let qty = 1;
 const MAX_QTY = 10;
 const MIN_QTY = 1;
 let selectedSlot = null;
+let delivery = false;
 
 const qtyDisplay = document.getElementById("qty-display");
 const slotGrid   = document.getElementById("slot-grid");
@@ -62,27 +63,31 @@ function selectSlot(s) {
   updateSubmitBtn();
 }
 
-function toggleDelivery() {
-  const checked = document.getElementById('chk-delivery').checked;
-  document.getElementById('address-group').style.display = checked ? 'block' : 'none';
+function setDeliveryMode(isDelivery) {
+  delivery = isDelivery;
+  const slotWrap = document.getElementById('slot-wrap');
+  if (slotWrap) slotWrap.style.display = isDelivery ? 'none' : 'block';
+  document.getElementById('address-group').style.display = isDelivery ? 'block' : 'none';
+  if (!isDelivery) { selectedSlot = null; loadSlots(); }
+  updateSubmitBtn();
 }
 
 function updateSubmitBtn() {
-  btnSubmit.disabled = !selectedSlot;
+  btnSubmit.disabled = delivery ? false : !selectedSlot;
 }
+
 
 btnSubmit.addEventListener("click", async () => {
   errorMsg.textContent = "";
   const name    = document.getElementById("inp-name").value.trim();
   const phone   = document.getElementById("inp-phone").value.trim();
   const email   = document.getElementById("inp-email").value.trim();
-  const delivery = document.getElementById("chk-delivery").checked;
-  const address = delivery ? document.getElementById("inp-address").value.trim() : "";
+    const address = delivery ? document.getElementById("inp-address").value.trim() : "";
 
   if (!name)  { errorMsg.textContent = "נא להזין שם"; return; }
   if (!phone) { errorMsg.textContent = "נא להזין טלפון"; return; }
   if (!email) { errorMsg.textContent = "נא להזין אימייל"; return; }
-  if (!selectedSlot) { errorMsg.textContent = "נא לבחור שעה"; return; }
+  if (!delivery && !selectedSlot) { errorMsg.textContent = "נא לבחור שעה"; return; }
   if (delivery && !address) { errorMsg.textContent = "נא להזין כתובת למשלוח"; return; }
 
   btnSubmit.disabled = true;
