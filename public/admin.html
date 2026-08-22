@@ -49,7 +49,8 @@ tr:hover td { background: #f9f9f9; }
 <div class="stats">
 <div class="stat-card"><div class="num" id="stat-people">—</div><div class="lbl">נרשמים</div></div>
 <div class="stat-card"><div class="num" id="stat-mezuzot">—</div><div class="lbl">מזוזות</div></div>
-<div class="stat-card"><div class="num" id="stat-income">—</div><div class="lbl">הכנסה צפויה (₪)</div></div>
+<div class="stat-card"><div class="num" id="stat-check">—</div><div class="lbl">הכנסה מבדיקה (₪)</div></div>
+<div class="stat-card"><div class="num" id="stat-delivery">—</div><div class="lbl">הכנסה ממשלוח (₪)</div></div>
 </div>
 <div id="table-wrap"><p class="empty">טוען...</p></div>
 </div>
@@ -82,7 +83,8 @@ const list = await res.json();
 document.getElementById("stat-people").textContent = list.length;
 const totalMez = list.reduce((s, a) => s + a.qty, 0);
 document.getElementById("stat-mezuzot").textContent = totalMez;
-document.getElementById("stat-income").textContent = list.reduce((s,a)=>s+a.price,0);
+document.getElementById("stat-check").textContent = list.reduce((s,a)=>s+a.qty*20,0);
+document.getElementById("stat-delivery").textContent = list.reduce((s,a)=>s+(a.delivery?30:0),0);
 if (list.length === 0) { document.getElementById("table-wrap").innerHTML = "<p class='empty'>אין רישומים עדיין</p>"; return; }
 const rows = list.map(a => `
 <tr>
