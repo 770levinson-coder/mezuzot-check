@@ -59,7 +59,7 @@ app.get("/api/slots", async (req, res) => {
     const duration = qty * config.event.minutesPerMezuza;
     const startMin = toMin(config.event.startTime);
     const endMin = toMin(config.event.endTime);
-    const occupied = Object.values(await store.all()).filter(a => !a.delivery).map(a => ({
+    const occupied = Object.values(await store.all()).filter(a => a.startTime && a.startTime !== '—').map(a => ({
       start: toMin(a.startTime),
       end: toMin(a.startTime) + a.qty * config.event.minutesPerMezuza,
     }));
@@ -93,7 +93,7 @@ app.post("/api/register", async (req, res) => {
       const endMin = toMin(config.event.endTime);
       if (tStart < startMin || tEnd > endMin)
         return res.status(400).json({ error:"shaa lo takana" });
-      const occupied = Object.values(await store.all()).filter(a => !a.delivery).map(a => ({
+      const occupied = Object.values(await store.all()).filter(a => a.startTime && a.startTime !== '—').map(a => ({
         start: toMin(a.startTime),
         end: toMin(a.startTime) + a.qty * config.event.minutesPerMezuza,
       }));
