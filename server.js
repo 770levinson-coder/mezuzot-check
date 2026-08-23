@@ -213,13 +213,15 @@ app.post("/api/edit/:id", async (req, res) => {
     const appts = await store.all();
     const appt = appts[req.params.id];
     if (!appt) return res.status(404).json({ error: "not found" });
-    const { startTime, endTime, qty } = req.body;
+    const { startTime, endTime, qty, delivery, address } = req.body;
     const qtyN = parseInt(qty);
-    if (!startTime || !endTime || !qtyN || qtyN < 1 || qtyN > config.event.maxPerPerson)
+    if (!qtyN || qtyN < 1 || qtyN > config.event.maxPerPerson)
+      return res.status(400).json({ error: "invalid" });
+    if (!delivery && (!startTime || !endTime))
       return res.status(400).json({ error: "invalid" });
     const basePrice = qtyN * config.event.pricePerMezuza;
     const deliveryFee = appt.delivery ? 30 : 0;
-    const updated = { ...appt, startTime, endTime, qty: qtyN, price: basePrice + deliveryFee };
+    const updated = { ...appt, startTime, endTime, qty: qtyN, delivery: !!delivery, address: address || appt.address || '', price: basePrice + (delivery ? 30 : 0) };
     await store.add(updated);
     res.json({ ok: true });
   } catch(e) { res.status(500).json({ error: e.message }); }
