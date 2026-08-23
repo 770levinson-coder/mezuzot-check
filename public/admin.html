@@ -96,6 +96,7 @@ const rows = list.map(a => `
 <td>${a.price} ₪</td>
 <td>${a.delivery ? 'כן — '+a.address : 'לא'}</td>
 <td>${a.notes||''}</td>
+<td><a href="/edit.html?id=${a.id}" target="_blank" style="font-size:12px;color:#0066cc">קישור</a></td>
 <td style="display:flex;gap:6px">
 <button class="btn btn-blue" onclick="openEdit('${a.id}','${a.name}','${a.phone}','${a.email||''}')">עריכה</button>
 <button class="btn btn-red" onclick="del('${a.id}')">מחק</button>
@@ -105,7 +106,7 @@ const rows = list.map(a => `
 document.getElementById("table-wrap").innerHTML = `
 <table>
 <thead><tr>
-<th>שעת כניסה</th><th>שם</th><th>טלפון</th><th>מייל</th><th>מזוזות</th><th>מחיר</th><th>משלוח</th><th>הערות</th><th></th>
+<th>שעת כניסה</th><th>שם</th><th>טלפון</th><th>מייל</th><th>מזוזות</th><th>מחיר</th><th>משלוח</th><th>הערות</th><th>קישור</th><th></th>
 </tr></thead>
 <tbody>${rows}</tbody>
 </table>
