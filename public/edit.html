@@ -23,10 +23,23 @@
   <h2>📜 עדכון פרטי הרשמה</h2>
   <div class="info" id="current-info">טוען פרטים...</div>
   <form id="edit-form">
+    <div style="margin-bottom:16px">
+    <label style="font-weight:600">אופן קבלת השירות:</label>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:normal"><input type="radio" name="delivery-mode" value="self" id="radio-self" onchange="setDeliveryMode(false)" checked style="width:18px;height:18px;accent-color:#800020" /> <span>אביא את המזוזות אלינו</span></label>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:normal"><input type="radio" name="delivery-mode" value="delivery" id="radio-delivery" onchange="setDeliveryMode(true)" style="width:18px;height:18px;accent-color:#800020" /> <span>שירות הגעה לבית <small style="color:#888">(תוספת 30 ₪)</small></span></label>
+    </div>
+  </div>
     <label for="qty-select">מספר מזוזות</label>
     <select id="qty-select"></select>
+    <div id="slot-wrap">
     <label for="slot-select">שעת הגעה</label>
     <select id="slot-select"></select>
+    </div>
+    <div id="address-group" style="display:none">
+    <label for="inp-address">כתובת</label>
+    <input type="text" id="inp-address" placeholder="רחוב, מספר בית, קומה" />
+    </div>
     <button type="submit">עדכן פרטים</button>
   </form>
   <div id="msg"></div>
@@ -65,6 +78,9 @@ async function init() {
 
   // Load slots for current qty
   await loadSlots(currentAppt.qty);
+  setDeliveryMode(!!currentAppt.delivery);
+  if (currentAppt.address) document.getElementById('inp-address').value = currentAppt.address;
+  if (currentAppt.delivery) document.getElementById('radio-delivery').checked = true;
 
   qtyEl.addEventListener('change', () => loadSlots(parseInt(qtyEl.value)));
 }
@@ -103,23 +119,35 @@ async function loadSlots(qty) {
 document.getElementById('edit-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const qty = parseInt(document.getElementById('qty-select').value);
-  const parts = document.getElementById('slot-select').value.split('|');
-  const startTime = parts[0], endTime = parts[1];
+  const delivery = document.querySelector('input[name="delivery-mode"]:checked').value === 'delivery';
+  const address = document.getElementById('inp-address').value.trim();
+  let startTime = '—', endTime = '—';
+  if (!delivery) {
+    const parts = document.getElementById('slot-select').value.split('|');
+    startTime = parts[0]; endTime = parts[1];
+  }
   const r = await fetch('/api/edit/'+id, {
     method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ qty, startTime, endTime })
+    body: JSON.stringify({ qty, startTime, endTime, delivery, address })
   });
   const msgEl = document.getElementById('msg');
   if (r.ok) {
     msgEl.className='msg ok'; msgEl.textContent='הפרטים עודכנו בהצלחה!';
     document.getElementById('current-info').innerHTML =
       'שלום <strong>'+currentAppt.name+'</strong>,<br>'+
-      'הרשמה מעודכנת: <strong>'+qty+'</strong> מזוזות | שעה: <strong>'+startTime+'–'+endTime+'</strong>';
+      'הרשמה מעודכנת: <strong>'+qty+'</strong> מזוזות'+
+      (delivery ? '<br>שירות הגעה לבית: <strong>'+address+'</strong>' : ' | שעה: <strong>'+startTime+'–'+endTime+'</strong>');
   } else {
     const err = await r.json().catch(()=>({}));
     msgEl.className='msg err'; msgEl.textContent='שגיאה: '+(err.error||'נסה שוב');
   }
 });
+
+function setDeliveryMode(isDelivery) {
+  document.getElementById('slot-wrap').style.display = isDelivery ? 'none' : 'block';
+  document.getElementById('address-group').style.display = isDelivery ? 'block' : 'none';
+  if (!isDelivery) loadSlots(parseInt(document.getElementById('qty-select').value) || 1);
+}
 
 init();
 </script>
