@@ -144,9 +144,13 @@ document.getElementById('edit-form').addEventListener('submit', async (e) => {
 });
 
 function setDeliveryMode(isDelivery) {
-  document.getElementById('slot-wrap').style.display = isDelivery ? 'none' : 'block';
+  const slotWrap = document.getElementById('slot-wrap');
+  const wasDelivery = slotWrap.style.display === 'none';
+  slotWrap.style.display = isDelivery ? 'none' : 'block';
   document.getElementById('address-group').style.display = isDelivery ? 'block' : 'none';
-  if (!isDelivery) loadSlots(parseInt(document.getElementById('qty-select').value) || 1);
+  if (!isDelivery && wasDelivery) {
+    loadSlots(parseInt(document.getElementById('qty-select').value) || 1);
+  }
 }
 
 init();
