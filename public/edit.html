@@ -98,8 +98,8 @@ async function loadSlots(qty) {
     starts = data.slots || [];
   }
   // Always include current slot
-  if (currentAppt && !starts.includes(currentAppt.startTime)) {
-    starts.unshift(currentAppt.startTime);
+  if (currentAppt && !starts.includes(currentAppt.startTime) && currentAppt.startTime !== '—') {
+      starts.unshift(currentAppt.startTime);
   }
   slotEl.innerHTML = '';
   const mpp = (eventConfig && eventConfig.minutesPerMezuza) || 4;
