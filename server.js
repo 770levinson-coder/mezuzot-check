@@ -119,7 +119,7 @@ app.post("/api/register", async (req, res) => {
     const secDate = config.event.date.split(",")[1].trim();
     let smsMsg = "שלום "+name+", רישומך לבדיקת מזוזות התקבל!\n"
       +"יום "+dayName+", "+config.event.hebrewDate+", "+secDate+"\n"
-      +"שעה: "+startTime+" | "+qtyN+" מזוזות\n"
+      +"שעה: "+startTime+"\n"+"מזוזות: "+qtyN+"\n"
       +"מיקום: "+config.event.location+"\n";
     if (delivery) smsMsg += "משלוח: "+address+"\n";
         smsMsg += "לשינוי פרטים: "+editUrl+"\n";
