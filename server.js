@@ -10,6 +10,13 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+app.use((req, res, next) => {
+  if (req.hostname === 'nofhaemek.co.il') {
+    return res.redirect(301, 'https://pub.chabadisrael.co.il/campaign-donation/%D7%A7%D7%9E%D7%A4%D7%99%D7%99%D7%9F-%D7%94%D7%AA%D7%A8%D7%9E%D7%94-%D7%A9%D7%A0%D7%AA%D7%99-%D7%9E%D7%92%D7%93%D7%9C-%D7%94%D7%A2%D7%9E%D7%A7');
+  }
+  next();
+});
+
 app.use(express.static(path.join(__dirname, "public")));
 
 function toMin(t) {
